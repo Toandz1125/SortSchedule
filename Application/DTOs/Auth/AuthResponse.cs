@@ -1,3 +1,5 @@
+using SortSchedule.Domain.Enums;
+
 namespace SortSchedule.Application.DTOs.Auth;
 
 public sealed class AuthResponse
@@ -12,5 +14,6 @@ public sealed class AuthResponse
 
     public string Email { get; init; } = string.Empty;
 
-    public IReadOnlyList<string> Roles { get; init; } = [];
+    public IReadOnlyList<RolesEnum> Roles { get; init; } = [];
 }
+

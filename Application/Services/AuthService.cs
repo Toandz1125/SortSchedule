@@ -4,6 +4,7 @@ using SortSchedule.Application.DTOs.Auth;
 using SortSchedule.Domain.Entities;
 using Shared.Common;
 using System.Net;
+using SortSchedule.Application.Abstractions.User;
 
 namespace SortSchedule.Application.Services;
 
@@ -11,74 +12,16 @@ public sealed class AuthService(
     IUserRepository userRepository,
     ITokenService tokenService,
     IPasswordHasher passwordHasher,
-    IValidator<RegisterRequest> registerValidator,
+
     IValidator<LoginRequest> loginValidator,
     IValidator<RefreshTokenRequest> refreshValidator) : IAuthService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITokenService _tokenService = tokenService;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
-    private readonly IValidator<RegisterRequest> _registerValidator = registerValidator;
+
     private readonly IValidator<LoginRequest> _loginValidator = loginValidator;
     private readonly IValidator<RefreshTokenRequest> _refreshValidator = refreshValidator;
-
-    public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
-    {
-        await _registerValidator.ValidateAndThrowAsync(request, ct);
-
-        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var exists = await _userRepository.ExistsAsync(normalizedEmail, ct);
-        if (exists)
-        {
-            return Result<AuthResponse>.FailureResult("Email is already in use.", "EMAIL_ALREADY_EXISTS", HttpStatusCode.Conflict);
-        }
-
-        var user = new AppUser
-        {
-            Email = normalizedEmail,
-            UserName = request.UserName.Trim(),
-            PasswordHash = _passwordHasher.Hash(request.Password)
-        };
-
-        var studentRole = await _userRepository.GetRoleByNameAsync("Student", ct);
-        if (studentRole is null)
-        {
-            return Result<AuthResponse>.FailureResult("Default role 'Student' is missing.", "ROLE_MISSING", HttpStatusCode.InternalServerError);
-        }
-
-        user.UserRoles.Add(new UserRole
-        {
-            UserId = user.Id,
-            RoleId = studentRole.Id,
-            User = user,
-            Role = studentRole
-        });
-
-        var roles = new[] { studentRole.Name };
-        var accessToken = _tokenService.GenerateAccessToken(user, roles);
-        var (rawToken, tokenHash) = _tokenService.GenerateRefreshToken();
-
-        user.RefreshTokens.Add(new RefreshToken
-        {
-            TokenHash = tokenHash,
-            UserId = user.Id,
-            User = user,
-            ExpiresAtUtc = DateTime.UtcNow.AddDays(7)
-        });
-
-        await _userRepository.AddAsync(user, ct);
-        await _userRepository.SaveChangesAsync(ct);
-
-        return Result<AuthResponse>.SuccessResult(new AuthResponse
-        {
-            AccessToken = accessToken,
-            RefreshToken = rawToken,
-            ExpiresAtUtc = DateTime.UtcNow.AddMinutes(15),
-            UserName = user.UserName,
-            Email = user.Email,
-            Roles = roles
-        }, "Registration successful", HttpStatusCode.Created);
-    }
 
     public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
@@ -116,6 +59,8 @@ public sealed class AuthService(
 
             await _userRepository.SaveChangesAsync(ct);
 
+            var enumRoles = roles.Select(r => Enum.Parse<SortSchedule.Domain.Enums.RolesEnum>(r)).ToArray();
+
             return Result<AuthResponse>.SuccessResult(new AuthResponse
             {
                 AccessToken = accessToken,
@@ -123,8 +68,9 @@ public sealed class AuthService(
                 ExpiresAtUtc = DateTime.UtcNow.AddMinutes(15),
                 UserName = user.UserName,
                 Email = user.Email,
-                Roles = roles
+                Roles = enumRoles
             });
+
 
         }
         catch (ValidationException)
@@ -181,6 +127,8 @@ public sealed class AuthService(
 
         await _userRepository.SaveChangesAsync(ct);
 
+        var enumRoles = roles.Select(r => Enum.Parse<SortSchedule.Domain.Enums.RolesEnum>(r)).ToArray();
+
         return Result<AuthResponse>.SuccessResult(new AuthResponse
         {
             AccessToken = accessToken,
@@ -188,13 +136,20 @@ public sealed class AuthService(
             ExpiresAtUtc = DateTime.UtcNow.AddMinutes(15),
             UserName = user.UserName,
             Email = user.Email,
-            Roles = roles
+            Roles = enumRoles
         });
     }
+
+
 
     private (string RawToken, string TokenHash) BuildHashOnly(string rawToken)
     {
         var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(rawToken)));
         return (rawToken, hash);
+    }
+
+    public async Task<HashSet<string>> GetUserPermissionsAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _userRepository.GetPermissionsAsync(userId, cancellationToken);
     }
 }

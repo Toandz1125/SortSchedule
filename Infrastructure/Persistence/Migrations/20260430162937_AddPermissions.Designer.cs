@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SortSchedule.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using SortSchedule.Infrastructure.Persistence;
 namespace SortSchedule.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430162937_AddPermissions")]
+    partial class AddPermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,13 +171,6 @@ namespace SortSchedule.Infrastructure.Persistence.Migrations
                             Action = 2,
                             Name = "Update Feedback",
                             Resource = "Feedback"
-                        },
-                        new
-                        {
-                            Id = new Guid("d1c83b20-4e9f-46b2-a03d-7e4f5a6b2d1c"),
-                            Action = 1,
-                            Name = "Create User",
-                            Resource = "User"
                         });
                 });
 
@@ -282,12 +278,6 @@ namespace SortSchedule.Infrastructure.Persistence.Migrations
                         {
                             RoleId = new Guid("6a8ebea7-0d17-4178-ad20-9ea0f0c2f771"),
                             PermissionId = new Guid("e5c83b20-4e9f-46b2-a03d-7e4f5a6b2c3d"),
-                            Effect = 0
-                        },
-                        new
-                        {
-                            RoleId = new Guid("6a8ebea7-0d17-4178-ad20-9ea0f0c2f771"),
-                            PermissionId = new Guid("d1c83b20-4e9f-46b2-a03d-7e4f5a6b2d1c"),
                             Effect = 0
                         });
                 });
