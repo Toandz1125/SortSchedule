@@ -1,6 +1,6 @@
 using SortSchedule.Domain.Entities;
 
-namespace SortSchedule.Application.Abstractions.Auth;
+namespace SortSchedule.Application.Abstractions.User;
 
 public interface IUserRepository
 {
@@ -13,10 +13,15 @@ public interface IUserRepository
     Task AddAsync(AppUser user, CancellationToken ct = default);
 
     Task<AppRole?> GetRoleByNameAsync(string roleName, CancellationToken ct = default);
+    Task<AppRole?> GetRoleByEnumAsync(SortSchedule.Domain.Enums.RolesEnum roleEnum, CancellationToken ct = default);
+
 
     Task<RefreshToken?> GetActiveRefreshTokenByHashAsync(string tokenHash, CancellationToken ct = default);
 
     Task RevokeAllRefreshTokensAsync(Guid userId, CancellationToken ct = default);
 
     Task SaveChangesAsync(CancellationToken ct = default);
+
+    Task UpdateAsync(AppUser user, CancellationToken ct = default);
+    Task<HashSet<string>> GetPermissionsAsync(Guid userId, CancellationToken cancellationToken = default);
 }

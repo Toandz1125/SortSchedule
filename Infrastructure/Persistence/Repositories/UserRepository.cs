@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SortSchedule.Application.Abstractions.Auth;
+using SortSchedule.Application.Abstractions.User;
 using SortSchedule.Domain.Entities;
+using SortSchedule.Domain.Enums;
 
 namespace SortSchedule.Infrastructure.Persistence.Repositories;
 
@@ -40,6 +41,12 @@ public sealed class UserRepository(AppDbContext dbContext) : IUserRepository
         return await _dbContext.Roles.FirstOrDefaultAsync(x => x.Name == roleName, ct);
     }
 
+    public async Task<AppRole?> GetRoleByEnumAsync(RolesEnum roleEnum, CancellationToken ct = default)
+    {
+        var roleName = roleEnum.ToString();
+        return await GetRoleByNameAsync(roleName, ct);
+    }
+
     public async Task<RefreshToken?> GetActiveRefreshTokenByHashAsync(string tokenHash, CancellationToken ct = default)
     {
         var now = DateTime.UtcNow;
@@ -69,5 +76,33 @@ public sealed class UserRepository(AppDbContext dbContext) : IUserRepository
     public Task SaveChangesAsync(CancellationToken ct = default)
     {
         return _dbContext.SaveChangesAsync(ct);
+    }
+
+    public async Task<HashSet<string>> GetPermissionsAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var permissions = await _dbContext.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .SelectMany(ur => ur.Role!.Permissions)
+            .Select(rp => new { rp.Permission!.Resource, rp.Permission.Action, rp.Effect })
+            .ToListAsync(cancellationToken);
+
+        var allowed = permissions
+            .Where(p => p.Effect == PermissionEffect.Allow)
+            .Select(p => $"{p.Resource}:{p.Action}")
+            .ToHashSet();
+
+        var denied = permissions
+            .Where(p => p.Effect == PermissionEffect.Deny)
+            .Select(p => $"{p.Resource}:{p.Action}")
+            .ToHashSet();
+
+        allowed.ExceptWith(denied);
+        return allowed;
+    }
+
+    public Task UpdateAsync(AppUser user, CancellationToken ct = default)
+    {
+        _dbContext.Users.Update(user);
+        return Task.CompletedTask;
     }
 }

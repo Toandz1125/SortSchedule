@@ -1,6 +1,6 @@
-using SortSchedule.Infrastructure.DI;
-using SortSchedule.Middleware;
+using SortSchedule.Infrastructure.Middleware;
 using Microsoft.OpenApi.Models;
+using SortSchedule.Infrastructure.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,0 +1,497 @@
+﻿SortSchedule
+T├ái liß╗çu Kß╗╣ thuß║¡t ΓÇö Module Xß║┐p Lß╗ïch Hß╗ìc
+Phi├¬n bß║ún 2.0 ┬╖ To├án bß╗Ö luß╗ông xß╗¡ l├╜ tß╗½ Input ─æß║┐n Lß╗ïch ho├án chß╗ënh
+Thuß║¡t to├ín
+Graph Coloring (DSatur)
+Tabu Search 2000 iter
+Stack
+.NET 10 ┬╖ C# 13
+EF Core ┬╖ Redis ┬╖ xUnit
+Phß║ím vi
+5 ng├ánh ┬╖ 3 n─âm hß╗ìc
+GV th╞░ß╗¥ng tr├║ + mß╗¥i
+1. Tß╗òng quan Module Xß║┐p Lß╗ïch
+Module xß║┐p lß╗ïch l├á l├╡i cß╗ºa SortSchedule, chß╗ïu tr├ích nhiß╗çm tß╗▒ ─æß╗Öng ph├ón bß╗ò Lesson (buß╗òi hß╗ìc) v├áo bß╗Ö ba (Teacher, Room, TimeSlot) thoß║ú m├ún to├án bß╗Ö hard constraints v├á tß╗æi ╞░u soft constraints.
+1.1 Ba c├óu hß╗Åi cß╗æt l├╡i
+C├óu hß╗Åi
+Trß║ú lß╗¥i bß╗ƒi
+Output
+Ai dß║íy?
+GraphColoringSolver (pha 1)
+Constraint: AvailableWindow, MaxSlots
+AssignedTeacherId tr├¬n Lesson
+ß╗₧ ─æ├óu?
+GraphColoringSolver (pha 1)
+Constraint: RoomType, Capacity
+AssignedRoomId (null nß║┐u Online)
+Khi n├áo?
+TabuSearchSolver (pha 2)
+Constraint: Spread, Gap, Preference
+AssignedTimeSlotId tr├¬n Lesson
+1.2 Kiß║┐n tr├║c Pipeline ΓÇö 4 b╞░ß╗¢c
+B╞░ß╗¢c
+T├¬n
+─Éß║ºu v├áo
+─Éß║ºu ra
+Γæá
+Input Validation
+ScheduleScenario (sections, teachers, rooms)
+Validated scenario hoß║╖c ValidationError
+Γæí
+Graph Coloring ΓÇö DSatur
+Validated scenario + AvailableWindow
+Seed schedule ΓÇö hard constraints clean
+Γæó
+Tabu Search Optimizer
+Seed schedule + LecturerConstraints
+Optimized schedule vß╗¢i HardSoftScore
+Γæú
+Conflict Reporter
+Optimized schedule
+List<ScheduleConflict> cho Admin
+2. B╞░ß╗¢c Γæá ΓÇö Input Validation
+Tr╞░ß╗¢c khi chß║íy solver, hß╗ç thß╗æng kiß╗âm tra t├¡nh ─æß║ºy ─æß╗º v├á nhß║Ñt qu├ín cß╗ºa dß╗» liß╗çu ─æß║ºu v├áo. Lß╗ùi ß╗ƒ b╞░ß╗¢c n├áy trß║ú vß╗ü ngay ΓÇö kh├┤ng chß║íy solver vß╗¢i data thiß║┐u.
+2.1 C├íc kiß╗âm tra bß║»t buß╗Öc
+Kiß╗âm tra
+─Éiß╗üu kiß╗çn lß╗ùi
+H├ánh ─æß╗Öng
+Section kh├┤ng c├│ GV
+Teachers.Count == 0
+Throw ValidationException
+GV mß╗¥i ch╞░a c├│ AvailableWindow
+Type==Guest && Windows.Empty
+Throw ΓÇö Admin phß║úi lock window tr╞░ß╗¢c
+Session kh├┤ng c├│ StudentGroup
+StudentGroupIds.Empty
+Throw ValidationException
+Ph├▓ng kh├┤ng ─æß╗º sß╗⌐c chß╗⌐a cho bß║Ñt kß╗│ section n├áo
+Tß║Ñt cß║ú Room.Capacity < tß╗òng SV
+Warning ΓÇö kh├┤ng Throw, b├ío Admin
+Sß╗æ TimeSlot < sß╗æ Lesson cß║ºn xß║┐p
+AvailableSlots < TotalLessons
+Throw ΓÇö kh├┤ng thß╗â xß║┐p ─æß╗º
+2.2 Thß╗⌐ tß╗▒ ╞░u ti├¬n Lesson ΓÇö ─Éß║ºu v├áo cho DSatur
+Sau khi validate, solver sß║»p xß║┐p lß║íi c├íc Lesson theo ─æß╗Ö kh├│ giß║úm dß║ºn tr╞░ß╗¢c khi t├┤ m├áu ─æß╗ô thß╗ï:
+─Éß╗Ö ╞░u
+Ti├¬u ch├¡
+L├╜ do
+V├¡ dß╗Ñ
+1
+GV mß╗¥i (Guest) + AvailableWindow hß║╣p
+├ìt slot nhß║Ñt ΓÇö phß║úi xß║┐p tr╞░ß╗¢c khi hß║┐t chß╗ù
+GS. Koichi Nomura: chß╗ë T2+T4 s├íng
+2
+M├┤n Required + SessionsPerWeek > 1
+Vß╗½a bß║»t buß╗Öc vß╗½a cß║ºn nhiß╗üu slot
+Kß╗╣ thuß║¡t NN: Required, 2 buß╗òi/tuß║ºn
+3
+Cross-department section (shared)
+Nhiß╗üu StudentGroup ΓåÆ conflict phß╗⌐c tß║íp
+An ninh PTBV: BCSE+MJM+EFTH
+4
+GV Resident + m├┤n Required
+Linh hoß║ít h╞ín vß╗ü slot
+TS. Tß║í Quang Ngß╗ìc: MySQL
+5
+M├┤n Elective (tß╗▒ chß╗ìn)
+Linh hoß║ít nhß║Ñt ΓÇö xß║┐p sau c├╣ng
+Hß╗ìc m├íy c╞í bß║ún, An ninh mß║íng
+3. B╞░ß╗¢c Γæí ΓÇö Graph Coloring (DSatur Solver)
+DSatur (Degree of Saturation) l├á thuß║¡t to├ín t├┤ m├áu ─æß╗ô thß╗ï heuristic. Mß╗ùi Lesson l├á mß╗Öt node, hai Lesson c├│ edge nß╗æi nhau nß║┐u kh├┤ng thß╗â c├╣ng TimeSlot. DSatur lu├┤n t├┤ node c├│ saturation cao nhß║Ñt tr╞░ß╗¢c.
+3.1 X├óy dß╗▒ng Conflict Graph
+Conflict graph l├á nß╗ün tß║úng cß╗ºa to├án bß╗Ö pha n├áy. Hai Lesson c├│ edge khi ch├║ng share ├¡t nhß║Ñt mß╗Öt t├ái nguy├¬n:
+─Éiß╗üu kiß╗çn tß║ío edge
+Giß║úi th├¡ch
+V├¡ dß╗Ñ thß╗▒c tß║┐
+C├╣ng Teacher
+GV kh├┤ng thß╗â ß╗ƒ 2 n╞íi c├╣ng l├║c
+TS. Tß║í Quang Ngß╗ìc dß║íy MySQL HP1 v├á HP2 ΓåÆ edge
+C├╣ng Room
+Ph├▓ng kh├┤ng thß╗â c├│ 2 lß╗¢p c├╣ng l├║c
+M─É-509 vß╗½a c├│ An ninh PTBV vß╗½a c├│ EFTH ΓåÆ edge
+C├╣ng StudentGroup
+Nh├│m SV kh├┤ng thß╗â hß╗ìc 2 m├┤n c├╣ng l├║c
+BCSE-2024 c├│ Thuß║¡t to├ín v├á MySQL c├╣ng giß╗¥ ΓåÆ edge
+Multi-session: c├╣ng ng├áy
+Buß╗òi 1 v├á buß╗òi 2 c├╣ng m├┤n kh├┤ng ─æ╞░ß╗úc c├╣ng ng├áy
+Kß╗╣ thuß║¡t NN buß╗òi 1 v├á buß╗òi 2 ΓåÆ edge nß║┐u c├╣ng ng├áy
+Elective: c├╣ng ng├ánh+n─âm
+2 m├┤n tß╗▒ chß╗ìn c├╣ng Faculty+Major+Year
+An ninh mß║íng v├á Hß╗ìc m├íy c├╣ng BCSE-2024 ΓåÆ edge
+3.2 Thuß║¡t to├ín DSatur ΓÇö Pseudocode
+FUNCTION DSaturSolve(lessons, scenario):
+  graph = BuildConflictGraph(lessons)
+  uncolored = lessons.OrderBy(priority)  // ╞░u ti├¬n Guest, Required, Multi-session
+  
+  WHILE uncolored.Any():
+    // Chß╗ìn node c├│ saturation cao nhß║Ñt (nhiß╗üu m├áu h├áng x├│m nhß║Ñt)
+    node = uncolored.MaxBy(n => n.NeighborColors.Count * 1000 + n.Degree)
+    
+    // Lß║Ñy tß║¡p slot hß╗úp lß╗ç
+    validSlots = GetValidSlots(node, scenario)
+    
+    IF validSlots.Empty:
+      conflicts.Add(new UnresolvedConflict(node))
+      CONTINUE  // b├ío lß╗ùi, tiß║┐p tß╗Ñc xß║┐p lesson kh├íc
+    
+    // Chß╗ìn slot tß╗æt nhß║Ñt
+    bestSlot = validSlots.MinBy(s => ScoreSlot(s, node, scenario))
+    Assign(node, bestSlot)
+    UpdateSaturation(graph, node)  // cß║¡p nhß║¡t saturation h├áng x├│m
+  
+  RETURN (seedSchedule, conflicts)
+3.3 GetValidSlots ΓÇö Whitelist vs Blacklist
+Logic lß║Ñy slot hß╗úp lß╗ç kh├íc nhau ho├án to├án giß╗»a GV mß╗¥i v├á GV th╞░ß╗¥ng tr├║:
+GV mß╗¥i giß║úng (Guest)
+GV th╞░ß╗¥ng tr├║ (Resident)
+Logic
+WHITELIST
+Slot PHß║óI nß║▒m trong AvailableWindow
+BLACKLIST
+Slot KH├öNG ─æ╞░ß╗úc l├á slot bß║¡n ─æ├ú khai b├ío
+Timezone
+GV Nhß║¡t (UTC+9): slot Vietnam ΓåÆ convert sang JST, kiß╗âm tra giß╗¥ hß╗úp l├╜ (8h-18h JST)
+Kh├┤ng ├íp dß╗Ñng
+Online
+DeliveryMode=Online ΓåÆ skip Room check, vß║½n check TimeSlot
+Offline ΓåÆ phß║úi c├│ Room ph├╣ hß╗úp
+Multi-session
+Buß╗òi 2 phß║úi c├ích buß╗òi 1 ΓëÑ 1 ng├áy
+Buß╗òi 2 phß║úi c├ích buß╗òi 1 ΓëÑ 1 ng├áy
+3.4 ScoreSlot ΓÇö Chß╗ìn slot tß╗æt nhß║Ñt trong validSlots
+Trong tß║¡p slot hß╗úp lß╗ç, DSatur chß╗ìn slot c├│ ─æiß╗âm thß║Ñp nhß║Ñt (penalty thß║Ñp = slot tß╗æt h╞ín):
+Ti├¬u ch├¡
+Penalty
+Ghi ch├║
+Ng├áy ─æ├ú c├│ nhiß╗üu lesson cß╗ºa nh├│m SV n├áy
++30/lesson
+Giß║úm dß╗ôn lß╗ïch cho SV
+Slot cuß╗æi ng├áy (tiß║┐t 10-11)
++20
+╞»u ti├¬n slot ─æß║ºu ng├áy cho m├┤n nß║╖ng
+GV mß╗¥i: ng├áy kh├íc vß╗¢i c├íc lesson ─æ├ú xß║┐p
++50
+Gom ng├áy cho GV mß╗¥i ΓÇö giß║úm di chuyß╗ân
+Multi-session: buß╗òi 2 c├ích buß╗òi 1 < 2 ng├áy
++50
+╞»u ti├¬n c├ích nhau ΓëÑ 2 ng├áy
+GV Resident: slot kh├┤ng phß║úi preference
++10-20
+Tß╗½ LecturerConstraint.Weight
+4. B╞░ß╗¢c Γæó ΓÇö Tabu Search Optimizer
+Tabu Search nhß║¡n seed tß╗½ DSatur v├á tß╗æi ╞░u HardSoftScore. Vß╗¢i seed ─æ├ú sß║ích hard constraints, Tabu chß╗ë tß║¡p trung v├áo soft constraints ΓÇö hß╗Öi tß╗Ñ nhanh h╞ín nhiß╗üu so vß╗¢i seed random.
+4.1 Tham sß╗æ ─æiß╗üu chß╗ënh
+Tham sß╗æ
+Gi├í trß╗ï c┼⌐
+Gi├í trß╗ï mß╗¢i
+L├╜ do thay ─æß╗òi
+MaxIterations
+5000
+2000
+Seed tß╗æt h╞ín ΓåÆ ├¡t iter ─æß╗º
+NeighborsPerIteration
+300
+200
+Search space nhß╗Å h╞ín
+Tß╗╖ lß╗ç Change:Swap
+70:30
+60:40
+Swap hiß╗çu quß║ú h╞ín vß╗¢i seed tß╗æt
+Tabu tenure
+20
+15
+Agility cao h╞ín
+Adaptive stopping (Mß╗ÜI)
+Kh├┤ng c├│
+500 iter no-improve
+Tr├ính l├úng ph├¡ thß╗¥i gian
+4.2 C╞í chß║┐ sinh Neighbor
+Move 1 ΓÇö Change (60%): ─Éß╗òi TimeSlot cß╗ºa mß╗Öt Lesson
+Chß╗ìn ngß║½u nhi├¬n mß╗Öt Lesson, thß╗¡ g├ín TimeSlot mß╗¢i. Chß╗ë accept nß║┐u kh├┤ng tß║ío Hard violation mß╗¢i.
+FUNCTION GenerateChangeMove(lesson, schedule, scenario):
+  candidateSlots = GetValidSlots(lesson, scenario)  // tß║¡p slot hß╗úp lß╗ç
+  candidateSlots.Remove(lesson.AssignedTimeSlot)    // trß╗½ slot hiß╗çn tß║íi
+  IF candidateSlots.Empty: RETURN null
+  newSlot = candidateSlots.RandomSample()
+  RETURN new ChangeMove(lesson.Id, newSlot)
+Move 2 ΓÇö Swap (40%): Ho├ín ─æß╗òi TimeSlot giß╗»a 2 Lesson
+Chß╗ìn 2 Lesson, ho├ín ─æß╗òi TimeSlot. Hiß╗çu quß║ú h╞ín Change khi cß║ºn giß║úi quyß║┐t deadlock ΓÇö mß╗Öt lesson kh├┤ng c├│ slot trß╗æng nh╞░ng c├│ thß╗â swap vß╗¢i lesson kh├íc.
+FUNCTION GenerateSwapMove(lesson1, lesson2, schedule):
+  // Kiß╗âm tra ho├ín ─æß╗òi c├│ tß║ío hard violation kh├┤ng
+  temp1 = lesson1 WITH slot = lesson2.AssignedTimeSlot
+  temp2 = lesson2 WITH slot = lesson1.AssignedTimeSlot
+  IF IsHardViolation(temp1) OR IsHardViolation(temp2): RETURN null
+  RETURN new SwapMove(lesson1.Id, lesson2.Id)
+4.3 HardSoftScore ΓÇö H├ám chß║Ñm ─æiß╗âm
+Score quyß║┐t ─æß╗ïnh neighbor n├áo ─æ╞░ß╗úc chß╗ìn. Hard violations lu├┤n ╞░u ti├¬n h╞ín Soft ΓÇö solver kh├┤ng bao giß╗¥ accept move t─âng Hard d├╣ giß║úm Soft nhiß╗üu.
+Constraint
+Score
+Ghi ch├║
+HARD VIOLATIONS
+GV/Room/StudentGroup conflict
+-10000
+Mß╗ùi vi phß║ím
+GV mß╗¥i ngo├ái AvailableWindow
+-10000
+Near-hard, solver tr├ính tuyß╗çt ─æß╗æi
+Ph├▓ng kh├┤ng ─æß╗º sß╗⌐c chß╗⌐a
+-5000
+Mß╗ùi section bß╗ï vi phß║ím
+Multi-session: 2 buß╗òi c├╣ng ng├áy
+-8000
+Bß║»t buß╗Öc c├ích nhau ΓëÑ 1 ng├áy
+Elective conflict c├╣ng ng├ánh+n─âm
+-5000
+SV kh├┤ng thß╗â chß╗ìn cß║ú 2
+SOFT PENALTIES
+SV dß╗ôn qu├í nhiß╗üu m├┤n 1 ng├áy (>4 lesson)
+-40
+Mß╗ùi lesson v╞░ß╗út ng╞░ß╗íng
+SV kh├┤ng d├án trß║úi ─æß╗üu (Gini coefficient)
+-30
+T├¡nh theo ph├ón phß╗æi lesson/ng├áy
+GV mß╗¥i: lesson rß║úi nhiß╗üu ng├áy
+-50
+Mß╗ùi ng├áy th├¬m ngo├ái ng├áy ─æß║ºu ti├¬n
+GV th╞░ß╗¥ng tr├║: slot kh├┤ng phß║úi preference
+-weight
+Tß╗½ LecturerConstraint.Weight (10-50)
+Multi-session: buß╗òi 2 c├ích buß╗òi 1 < 2 ng├áy
+-50
+Soft ΓÇö prefer ΓëÑ 2 ng├áy
+GV Online Nhß║¡t: slot tß╗æi VN (=─æ├¬m JST)
+-30
+Timezone constraint ΓÇö mß╗¢i
+4.4 Aspiration Criterion
+Nß║┐u mß╗Öt move nß║▒m trong Tabu list nh╞░ng tß║ío ra score tß╗æt h╞ín best-ever score, move ─æ├│ vß║½n ─æ╞░ß╗úc chß║Ñp nhß║¡n (override tabu). ─Éiß╗üu n├áy tr├ính bß╗Å lß╗í nghiß╗çm tß╗æt.
+IF move IN tabuList:
+    IF newScore > bestScore:  // aspiration criterion
+        ACCEPT move          // override tabu ΓÇö kh├┤ng bß╗Å lß╗í nghiß╗çm tß╗æt
+    ELSE:
+        SKIP move            // vß║½n tabu
+4.5 Adaptive Stopping
+Thay v├¼ chß║íy ─æ├║ng 2000 iteration, solver dß╗½ng sß╗¢m nß║┐u kh├┤ng cß║úi thiß╗çn ─æ╞░ß╗úc score sau 500 v├▓ng li├¬n tiß║┐p:
+stagnationCount = 0
+FOR iter IN 1..MaxIterations:
+    neighbors = GenerateNeighbors(200)
+    bestNeighbor = SelectBest(neighbors)
+    IF bestNeighbor.Score > currentBestScore:
+        currentBestScore = bestNeighbor.Score
+        stagnationCount = 0  // reset
+    ELSE:
+        stagnationCount++
+        IF stagnationCount >= 500:
+            BREAK  // dß╗½ng sß╗¢m ΓÇö kh├┤ng c├▓n cß║úi thiß╗çn
+5. B╞░ß╗¢c Γæú ΓÇö Conflict Reporter
+Sau khi solver ho├án tß║Ñt, ConflictReporter ph├ón t├¡ch kß║┐t quß║ú v├á tß║ío b├ío c├ío chi tiß║┐t cho Admin. ─É├óy l├á ─æiß╗âm kh├íc biß╗çt quan trß╗ìng so vß╗¢i hß╗ç thß╗æng hiß╗çn tß║íi ΓÇö kh├┤ng ─æ╞░ß╗úc ├óm thß║ºm bß╗Å qua lß╗ùi.
+5.1 Ph├ón loß║íi Conflict
+Loß║íi
+Level
+V├¡ dß╗Ñ
+H├ánh ─æß╗Öng Admin
+GuestNoSlot
+Hard
+Koichi Nomura: buß╗òi 2 kh├┤ng c├│ slot
+─É├ám ph├ín lß║íi window vß╗¢i GV hoß║╖c t├¼m GV thay thß║┐
+RequiredNotPlaced
+Hard
+M├┤n bß║»t buß╗Öc thiß║┐u 1 buß╗òi/tuß║ºn
+T─âng sß╗æ ph├▓ng hoß║╖c ─æiß╗üu chß╗ënh GV
+ElectiveConflict
+Soft
+2 m├┤n tß╗▒ chß╗ìn ESAS c├╣ng T5 tiß║┐t 5
+Dß╗¥i 1 m├┤n sang slot kh├íc thß╗º c├┤ng nß║┐u cß║ºn
+StudentGroupOverload
+Soft
+BCSE-2024 c├│ 5 lesson v├áo T2
+Xem x├⌐t dß╗¥i 1-2 lesson sang ng├áy kh├íc
+TimezoneViolation
+Soft
+Tamai: lesson l├║c 17:00 VN = 19:00 JST
+Dß╗¥i sang slot s├íng/tr╞░a
+5.2 Output API Response
+public class ScheduleResult {
+    public Guid ScheduleId { get; init; }
+    public HardSoftScore Score { get; init; }    // (-0, -142) = 0 hard, 142 soft penalty
+    public Schedule Schedule { get; init; }      // Lessons ─æ├ú ─æ╞░ß╗úc assign
+    public List<ScheduleConflict> Conflicts { get; init; }
+    public SolverStats Stats { get; init; }      // thß╗¥i gian, sß╗æ iter, phase
+}
+
+public class ScheduleConflict {
+    public ConflictType Type { get; init; }
+    public ConflictLevel Level { get; init; }    // Hard | Soft
+    public List<Guid> AffectedEntityIds { get; init; }
+    public string Message { get; init; }
+    // "GS. Koichi Nomura kh├┤ng c├│ slot n├áo cho Kß╗╣ thuß║¡t NN buß╗òi 2"
+}
+6. Bß║úng Constraints ─Éß║ºy ─æß╗º
+6.1 Hard Constraints ΓÇö vi phß║ím = lß╗ïch kh├┤ng hß╗úp lß╗ç
+Constraint
+─Éiß╗üu kiß╗çn
+├üp dß╗Ñng cho
+No-split GV
+ΓêÇ slot: count(lessons vß╗¢i same teacher) Γëñ 1
+Mß╗ìi teacher
+No-split Room
+ΓêÇ slot: count(lessons vß╗¢i same room) Γëñ 1
+Trß╗½ DeliveryMode=Online
+No-split StudentGroup
+ΓêÇ slot: count(lessons c├│ same group) Γëñ 1
+Check qua Section.StudentGroupIds
+AvailableWindow
+slot Γêê windows cß╗ºa GV mß╗¥i (whitelist)
+TeacherType=Guest
+Timezone
+slot.VNTime ΓåÆ convert JST Γêê [8h-18h]
+Online GV Nhß║¡t Bß║ún
+Sß╗⌐c chß╗⌐a
+room.Capacity ΓëÑ sum(group.Size in section)
+Mß╗ìi lesson Offline
+RoomType
+room.RoomType = course.RequiredRoomType
+Lab, ph├▓ng thß╗▒c h├ánh
+Multi-session no-same-day
+lessons[i].day Γëá lessons[j].day ΓêÇ iΓëáj
+SessionsPerWeek > 1
+Elective no-conflict
+ΓêÇ 2 elective sections c├╣ng Major+Year: slot kh├íc nhau
+CourseType=Elective
+Required fully placed
+count(placed lessons) = section.SessionsPerWeek
+CourseType=Required
+MaxSlotsPerWeek GV
+sum(lessons cß╗ºa teacher) Γëñ teacher.MaxSlotsPerWeek
+Theo hß╗úp ─æß╗ông
+6.2 Soft Constraints ΓÇö vi phß║ím = trß╗½ ─æiß╗âm
+Constraint
+Weight
+─Éß╗æi t╞░ß╗úng
+C├┤ng thß╗⌐c penalty
+D├án trß║úi ─æß╗üu SV
+-30
+StudentGroup
+Gini(lessons/ng├áy) ├ù 100
+Max lesson/ng├áy SV
+-40
+StudentGroup
+max(0, count - 4) ├ù 40 mß╗ùi ng├áy
+Gom ng├áy GV mß╗¥i
+-50
+Guest Teacher
+(distinctDays - 1) ├ù 50
+Slot ╞░a th├¡ch GV
+-weight
+Resident Teacher
+LecturerConstraint.Weight nß║┐u vi phß║ím
+Multi-session gap ΓëÑ 2 ng├áy
+-50
+Multi-session
+Mß╗ùi buß╗òi c├ích < 2 ng├áy
+Timezone GV Online
+-30
+Online Guest
+Slot convert JST ngo├ái 8h-18h
+GV mß╗¥i: AvailableWindow gß║ºn ─æß║ºy
+-1000
+Guest Teacher
+Near-hard: slot ngo├ái window
+7. Luß╗ông Dß╗» liß╗çu ΓÇö API Endpoints
+7.1 Endpoint ch├¡nh
+Endpoint
+Method
+Role
+M├┤ tß║ú
+/api/schedule/solve
+POST
+Admin
+Trigger solver pipeline bß║Ñt ─æß╗ông bß╗Ö, trß║ú jobId
+/api/schedule/result/{id}
+GET
+Admin/Lecturer
+Polling kß║┐t quß║ú + ConflictReport
+/api/schedule/scenarios
+POST
+Admin
+Tß║ío scenario ─æß║ºu v├áo mß╗¢i
+/api/schedule/scenarios/{id}
+GET
+Admin/Lecturer
+Xem scenario + trß║íng th├íi
+/api/constraints
+POST
+Lecturer
+GV ─æ─âng k├╜ constraint cß╗ºa m├¼nh
+/api/available-windows
+POST
+GV mß╗¥i
+─É─âng k├╜ AvailableWindow hß╗ìc kß╗│
+7.2 Async Job Pattern ΓÇö Tr├ính HTTP timeout
+TabuSearch 2000├ù200 c├│ thß╗â chß║íy 5-30 gi├óy tuß╗│ dataset. Kh├┤ng thß╗â ─æß╗â ─æß╗ông bß╗Ö trong request:
+// POST /api/schedule/solve ΓåÆ ngay lß║¡p tß╗⌐c trß║ú vß╗ü
+{ "jobId": "uuid-xyz", "status": "Queued" }
+
+// IHostedService chß║íy nß╗ün:
+// 1. Validate ΓåÆ 2. DSatur ΓåÆ 3. TabuSearch ΓåÆ 4. ConflictReport ΓåÆ 5. Persist
+
+// GET /api/schedule/result/uuid-xyz ΓåÆ polling
+{ "status": "Running", "phase": "TabuSearch", "iteration": 450, "progress": 22 }
+// Sau khi xong:
+{ "status": "Completed", "score": { "hard": 0, "soft": -142 },
+  "conflicts": [...], "scheduleId": "..." }
+7.3 Workflow Admin ΓÇö Timeline thß╗▒c tß║┐
+Thß╗¥i ─æiß╗âm
+Ng╞░ß╗¥i thß╗▒c hiß╗çn
+H├ánh ─æß╗Öng
+T - 3 tuß║ºn
+GV mß╗¥i giß║úng
+Submit AvailableWindow cho to├án hß╗ìc kß╗│
+T - 2 tuß║ºn
+Admin
+LOCK AvailableWindow ΓåÆ GV mß╗¥i kh├┤ng sß╗¡a ─æ╞░ß╗úc
+T - 2 tuß║ºn
+GV th╞░ß╗¥ng tr├║
+Submit LecturerConstraint (preference, slot bß║¡n)
+T - 1 tuß║ºn
+Admin
+POST /solve ΓåÆ Polling ΓåÆ Xem ConflictReport ΓåÆ Xß╗¡ l├╜ thß╗º c├┤ng nß║┐u cß║ºn
+T - 3 ng├áy
+Admin
+Review lß╗ïch ΓåÆ ─æiß╗üu chß╗ënh nhß╗Å (nß║┐u c├│) ΓåÆ Approve
+─Éß║ºu hß╗ìc kß╗│
+Admin
+PATCH /schedule/publish ΓåÆ Lock to├án bß╗Ö ΓåÆ GV/SV xem lß╗ïch
+8. Kß║┐ hoß║ích Implement ΓÇö Theo thß╗⌐ tß╗▒
+Sprint 1 (1-2 tuß║ºn) ΓÇö Domain Model mß╗¢i
+Th├¬m entity Faculty, Major, CurriculumEntry
+Th├¬m entity CourseSection vß╗¢i StudentGroupIds, Teachers (pool)
+Th├¬m entity SectionTeacher (SessionIndex?, Role)
+Sß╗¡a Lesson: th├¬m CourseSectionId, SessionIndex
+Th├¬m Teacher.TeacherType, Teacher.Timezone, Teacher.MaxSlotsPerWeek
+Th├¬m Course.DeliveryMode, Course.SessionsPerWeek
+Th├¬m AvailableWindow entity (IsLocked)
+Th├¬m ScheduleConflict entity
+Migrate EF Core ΓÇö bß╗Å InMemoryRepository
+Sprint 2 (2-3 tuß║ºn) ΓÇö Solver mß╗¢i
+Implement GraphColoringSolver thay FirstFitSolver
+BuildConflictGraph: check GV + Room + StudentGroup + Multi-session + Elective
+DSatur priority ordering: Guest > Required├ùMulti > Cross-dept > Resident > Elective
+GetValidSlots: whitelist cho Guest, blacklist cho Resident
+Timezone check cho GV Online Nhß║¡t Bß║ún
+Tune TabuSearch: 2000 iter, 60:40 ratio, adaptive stopping 500
+Implement ConflictReporter
+Chuyß╗ân sang async job (IHostedService)
+Sprint 3 (1-2 tuß║ºn) ΓÇö API & Security
+Th├¬m [HasPermission] v├áo ScheduleController
+Implement AvailableWindow lock workflow
+POST /available-windows, POST /constraints endpoints
+GET /schedule/result/{id} polling endpoint
+V├í JWT: Replace("Bearer ") ΓåÆ OrdinalIgnoreCase
+CORS whitelist domain cß╗Ñ thß╗â
+Rate limiting tr├¬n auth endpoints
+Sprint 4 (1 tuß║ºn) ΓÇö Testing & Benchmark
+Integration test: full pipeline vß╗¢i dataset thß╗▒c tß╗½ Excel
+Benchmark HardSoftScore: dataset 28 lß╗¢p HP vs dataset lß╗¢n h╞ín
+Unit test: GetValidSlots, ScoreSlot, ConflictReporter
+Load test: async job vß╗¢i 5 scenario chß║íy ─æß╗ông thß╗¥i
+Validate: lß╗ïch output ─æ├║ng vß╗¢i lß╗ïch Excel gß╗æc l├ám baseline

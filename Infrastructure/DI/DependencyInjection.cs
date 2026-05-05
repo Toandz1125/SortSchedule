@@ -7,8 +7,10 @@ using Microsoft.Extensions.Options;
 using SortSchedule.Application.Abstractions;
 using SortSchedule.Application.Abstractions.Auth;
 using SortSchedule.Application.DTOs.Auth;
+using SortSchedule.Application.DTOs.User;
 using SortSchedule.Application.Options;
 using SortSchedule.Application.Services;
+using SortSchedule.Application.Abstractions.User;
 using SortSchedule.Application.Validators;
 using SortSchedule.Infrastructure.Auth;
 using SortSchedule.Infrastructure.Persistence;
@@ -16,6 +18,8 @@ using SortSchedule.Infrastructure.Persistence.Repositories;
 using SortSchedule.Infrastructure.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Infrastructure.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SortSchedule.Infrastructure.DI;
 
@@ -49,8 +53,10 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
 
-        services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
+        services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
+        services.AddScoped<IValidator<ChangePasswordRequest>, ChangePasswordRequestValidator>();
         services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
         services.AddScoped<IValidator<RefreshTokenRequest>, RefreshTokenRequestValidator>();
 
@@ -74,6 +80,8 @@ public static class DependencyInjection
             });
 
         services.AddAuthorization();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         return services;
     }

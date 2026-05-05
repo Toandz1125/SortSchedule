@@ -7,4 +7,6 @@ public sealed class AppRole
     public string Name { get; set; } = string.Empty;
 
     public ICollection<UserRole> UserRoles { get; init; } = [];
+
+    public ICollection<RolePermission> Permissions { get; init; } = [];
 }
