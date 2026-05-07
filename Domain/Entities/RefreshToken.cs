@@ -2,7 +2,7 @@ namespace SortSchedule.Domain.Entities;
 
 public sealed class RefreshToken
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
 
     public string TokenHash { get; set; } = string.Empty;
 

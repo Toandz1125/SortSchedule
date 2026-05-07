@@ -87,12 +87,6 @@ public sealed class AuthService(
     {
         await _refreshValidator.ValidateAndThrowAsync(request, ct);
 
-        var validationResult = _tokenService.Validate(request.AccessToken);
-        if (!validationResult.IsValid || validationResult.UserId is null)
-        {
-            return Result<AuthResponse>.FailureResult(validationResult.Error ?? "Invalid access token.", "INVALID_TOKEN", HttpStatusCode.Unauthorized);
-        }
-
         var (_, inputHash) = BuildHashOnly(request.RefreshToken);
         var currentToken = await _userRepository.GetActiveRefreshTokenByHashAsync(inputHash, ct);
         if (currentToken is null)
@@ -100,14 +94,9 @@ public sealed class AuthService(
             return Result<AuthResponse>.FailureResult("Refresh token is invalid or expired.", "INVALID_REFRESH_TOKEN", HttpStatusCode.Unauthorized);
         }
 
-        if (currentToken.UserId != validationResult.UserId.Value)
-        {
-            return Result<AuthResponse>.FailureResult("Refresh token does not belong to the requested user.", "ACCESS_DENIED", HttpStatusCode.Forbidden);
-        }
-
         currentToken.RevokedAtUtc = DateTime.UtcNow;
 
-        var user = await _userRepository.GetByIdWithRolesAsync(validationResult.UserId.Value, ct);
+        var user = await _userRepository.GetByIdWithRolesAsync(currentToken.UserId, ct);
         if (user is null)
         {
             return Result<AuthResponse>.FailureResult("User no longer exists.", "USER_NOT_FOUND", HttpStatusCode.Unauthorized);
@@ -133,7 +122,7 @@ public sealed class AuthService(
         {
             AccessToken = accessToken,
             RefreshToken = newRawToken,
-            ExpiresAtUtc = DateTime.UtcNow.AddMinutes(15),
+            ExpiresAtUtc = DateTime.UtcNow.AddMinutes(30),
             UserName = user.UserName,
             Email = user.Email,
             Roles = enumRoles

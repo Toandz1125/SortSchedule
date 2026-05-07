@@ -69,8 +69,6 @@ public sealed class UserRepository(AppDbContext dbContext) : IUserRepository
                      && x.ExpiresAtUtc > now)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(t => t.RevokedAtUtc, now), ct);
-
-        _dbContext.ChangeTracker.Clear();
     }
 
     public Task SaveChangesAsync(CancellationToken ct = default)
