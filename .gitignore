@@ -5,3 +5,9 @@ obj/
 *.suo
 *.cache
 TestResults/
+/__pycache__
+/convert.py
+/implementation_plan.md
+/scratch_test.cs
+/output_schedule.json
+/sheduleData.xlsx
